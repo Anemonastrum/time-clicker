@@ -1,6 +1,5 @@
-// Top-level build file. Declared once so the app module can alias them without versions.
+// The compose compiler plugin already applies org.jetbrains.kotlin.android.
 plugins {
     alias(libs.plugins.androidApplication) apply false
-    alias(libs.plugins.kotlinAndroid) apply false
     alias(libs.plugins.composeCompiler) apply false
 }
