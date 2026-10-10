@@ -1,0 +1,113 @@
+name: Build
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: Build type
+        required: true
+        default: debug
+        type: choice
+        options:
+          - debug
+          - release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 9.8.0
+
+      - name: Resolve build type
+        id: bt
+        run: |
+          INPUT="${{ github.event.inputs.build_type }}"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "type=$INPUT" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.ref }}" = "refs/heads/main" ] || [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            echo "type=release" >> "$GITHUB_OUTPUT"
+          else
+            echo "type=debug" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build ${{ steps.bt.outputs.type }} APK
+        id: build
+        run: ./gradlew --no-daemon --stacktrace assemble${{ steps.bt.outputs.type == 'release' && 'Release' || 'Debug' }} 2>&1 | tee build.log
+        continue-on-error: true
+
+      - name: Collect failure artifacts
+        if: steps.build.outcome == 'failure'
+        run: |
+          mkdir -p artifacts
+          cp build.log artifacts/ || true
+          # Per-module reports: heapdumps, lint, unit test results.
+          find . -path ./artifacts -prune -o \( \
+            -name '*.hprof' -o \
+            -name 'results.xml' -o \
+            -name 'TEST-*.xml' -o \
+            -name 'lint-results*' -o \
+            -name 'reports' -type d \) -print 2>/dev/null | while read -r f; do
+              cp -r --parents "$f" artifacts/ 2>/dev/null || true
+            done
+
+      - name: Attach build log and reports on failure
+        if: steps.build.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log-and-reports
+          path: artifacts/
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: Fail the run if the build failed
+        if: steps.build.outcome == 'failure'
+        run: |
+          echo "::error::Gradle build failed — the full log is in the 'build-log-and-reports' artifact."
+          tail -n 80 build.log || true
+          exit 1
+
+      - name: Locate APK
+        id: apk
+        run: |
+          TYPE="${{ steps.bt.outputs.type }}"
+          APK=$(find app/build/outputs/apk/"$TYPE" -name '*.apk' | head -n 1)
+          echo "path=$APK" >> "$GITHUB_OUTPUT"
+          echo "Found APK: $APK"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: time-clicker-${{ steps.bt.outputs.type }}
+          path: ${{ steps.apk.outputs.path }}
+          if-no-files-found: error
+
+      - name: Publish release APK to GitHub Releases
+        if: steps.bt.outputs.type == 'release' && github.event_name != 'pull_request'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: release-${{ github.run_number }}
+          name: Release ${{ github.run_number }}
+          files: ${{ steps.apk.outputs.path }}
+          generate_release_notes: true
+          prerelease: ${{ github.event_name != 'workflow_dispatch' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

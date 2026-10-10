@@ -1,0 +1,21 @@
+[versions]
+agp = "9.4.1"
+kotlin = "2.4.20"
+jetbrains-compose-multiplatform = "1.12.0"
+androidx-activity = "1.13.0"
+androidx-core = "1.13.0"
+androidx-lifecycle = "2.9.4"
+
+[libraries]
+androidx-activity = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
+androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
+miuix-ui = { module = "top.yukonga.miuix.kmp:miuix-ui", version = "0.9.4" }
+miuix-icons = { module = "top.yukonga.miuix.kmp:miuix-icons", version = "0.9.4" }
+
+[plugins]
+androidApplication = { id = "com.android.application" }
+kotlinAndroid = { id = "org.jetbrains.kotlin.android" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "jetbrains-compose-multiplatform" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

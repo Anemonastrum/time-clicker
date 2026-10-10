@@ -1,0 +1,23 @@
+# Built files
+*.iml
+.gradle/
+build/
+app/build/
+captures/
+.cxx/
+local.properties
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Signing
+*.keystore
+*.jks
+!debug.keystore
+
+# Misc
+.DS_Store
+artifacts/
+build.log
