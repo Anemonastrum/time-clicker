@@ -24,6 +24,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
+    // ponytail: use the Android debug keystore shipped with AGP for a reproducible
+    // release-flavoured CI artifact; switch to a real signing key before publishing.
     signingConfigs {
         create("release") {
             enableV3Signing = true
@@ -45,7 +47,6 @@ android {
             applicationIdSuffix = ".debug"
         }
     }
-
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
