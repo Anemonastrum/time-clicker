@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -66,13 +65,13 @@ internal fun SettingsBody(
     onHideOverlay: () -> Unit,
 ) {
     // ponytail: a single screen of cards; no navigation until a second screen exists.
-    val timeState = remember { TextFieldState(startTime) }
-    val serverState = remember { TextFieldState(ntpServer) }
+    var timeText by remember { mutableStateOf(startTime) }
+    var serverText by remember { mutableStateOf(ntpServer) }
     var timeError by remember { mutableStateOf(false) }
 
     // Push external changes (e.g. overlay edits) back into the fields.
-    LaunchedEffect(startTime) { if (timeState.text.toString() != startTime) timeState.text = startTime }
-    LaunchedEffect(ntpServer) { if (serverState.text.toString() != ntpServer) serverState.text = ntpServer }
+    LaunchedEffect(startTime) { if (timeText != startTime) timeText = startTime }
+    LaunchedEffect(ntpServer) { if (serverText != ntpServer) serverText = ntpServer }
 
     Column(
         modifier = Modifier
@@ -89,13 +88,14 @@ internal fun SettingsBody(
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 TextField(
-                    state = timeState,
-                    label = "HH:MM:SS.mmm",
+                    value = timeText,
                     onValueChange = {
+                        timeText = it
                         val parsed = parseTimeOfDay(it)
                         timeError = parsed == null
                         if (parsed != null) onStartTimeChanged(it)
                     },
+                    label = "HH:MM:SS.mmm",
                 )
                 if (timeError) {
                     Text(
@@ -121,9 +121,12 @@ internal fun SettingsBody(
                     onCheckedChange = onNtpEnabledChanged,
                 )
                 TextField(
-                    state = serverState,
+                    value = serverText,
+                    onValueChange = {
+                        serverText = it
+                        onNtpServerChanged(it)
+                    },
                     label = "NTP server",
-                    onValueChange = { onNtpServerChanged(it) },
                 )
                 SliderRow(
                     label = "NTP timeout",
