@@ -24,10 +24,25 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    // ponytail: use the Android debug keystore shipped with AGP for a reproducible
-    // release-flavoured CI artifact; switch to a real signing key before publishing.
+    // ponytail: signed with the debug keystore so the release APK is installable out of
+    // the box; add a real upload key + secrets (storeFile/storePassword/keyAlias) when
+    // publishing to Play or when release-key provenance starts to matter.
     signingConfigs {
         create("release") {
+            // Overridden by CI secrets when present, else falls back to the debug keystore.
+            System.getenv("RELEASE_STORE_FILE")?.let { storeFile = file(it) }
+            System.getenv("RELEASE_STORE_PASSWORD")?.let { storePassword = it }
+            System.getenv("RELEASE_KEY_ALIAS")?.let { keyAlias = it }
+            System.getenv("RELEASE_KEY_PASSWORD")?.let { keyPassword = it }
+            if (storeFile == null) {
+                // Debug keystore lives in ~/.android on the build host.
+                storeFile = file(
+                    System.getProperty("user.home") + "/.android/debug.keystore"
+                )
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
             enableV3Signing = true
             enableV4Signing = true
         }
