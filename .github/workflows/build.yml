@@ -49,6 +49,9 @@ jobs:
             echo "type=debug" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Ensure debug keystore exists
+        run: keytool -genkeypair -v -storetype PKCS12 -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+
       - name: Build ${{ steps.bt.outputs.type }} APK
         id: build
         run: ./gradlew --no-daemon --stacktrace assemble${{ steps.bt.outputs.type == 'release' && 'Release' || 'Debug' }} 2>&1 | tee build.log
