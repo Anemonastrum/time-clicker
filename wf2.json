@@ -1,0 +1,17 @@
+{
+  "total_count": 1,
+  "workflows": [
+    {
+      "id": 380222827,
+      "node_id": "W_kwDOVDIfdM4Wqb1r",
+      "name": "Build",
+      "path": ".github/workflows/build.yml",
+      "state": "active",
+      "created_at": "2026-10-10T10:13:05.000+07:00",
+      "updated_at": "2026-10-10T10:13:05.000+07:00",
+      "url": "https://api.github.com/repos/Anemonastrum/time-clicker/actions/workflows/380222827",
+      "html_url": "https://github.com/Anemonastrum/time-clicker/blob/main/.github/workflows/build.yml",
+      "badge_url": "https://github.com/Anemonastrum/time-clicker/workflows/Build/badge.svg"
+    }
+  ]
+}
