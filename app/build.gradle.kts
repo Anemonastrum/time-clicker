@@ -68,10 +68,9 @@ dependencies {
     implementation(libs.miuix.icons)
 
     // JetBrains Compose Multiplatform artifacts; the compose compiler plugin wires the
-    // Android variants into an AGP module.
+    // Android variants into an AGP module. material3/ui-tooling are not published to
+    // Maven Central past 1.9.0 — miuix supplies the components instead.
     implementation("org.jetbrains.compose.ui:ui:1.12.0")
     implementation("org.jetbrains.compose.foundation:foundation:1.12.0")
-    implementation("org.jetbrains.compose.material3:material3:1.12.0")
     implementation("org.jetbrains.compose.runtime:runtime:1.12.0")
-    debugImplementation("org.jetbrains.compose.ui:ui-tooling:1.12.0")
 }
