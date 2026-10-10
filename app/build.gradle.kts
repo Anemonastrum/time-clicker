@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.androidApplication)
-    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.composeCompiler)
 }
 
@@ -55,27 +55,24 @@ android {
 }
 
 kotlin {
-    androidTarget()
     jvmToolchain(17)
-
-    sourceSets {
-        val androidMain by getting {
-            dependencies {
-                implementation(libs.miuix.ui)
-                implementation(libs.miuix.icons)
-                implementation(compose.ui)
-                implementation(compose.foundation)
-                implementation(compose.material3)
-                implementation(compose.uiTooling)
-                implementation(libs.androidx.activity)
-                implementation(libs.androidx.core.ktx)
-                implementation(libs.androidx.lifecycle.viewmodel.compose)
-                implementation(libs.androidx.lifecycle.runtime.ktx)
-            }
-        }
-    }
 }
 
 dependencies {
-    debugImplementation(compose.uiTooling)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.activity)
+
+    // MIUI X (HyperOS style) UI library.
+    implementation(libs.miuix.ui)
+    implementation(libs.miuix.icons)
+
+    // JetBrains Compose Multiplatform artifacts; the compose compiler plugin wires the
+    // Android variants into an AGP module.
+    implementation("org.jetbrains.compose.ui:ui:1.12.0")
+    implementation("org.jetbrains.compose.foundation:foundation:1.12.0")
+    implementation("org.jetbrains.compose.material3:material3:1.12.0")
+    implementation("org.jetbrains.compose.runtime:runtime:1.12.0")
+    debugImplementation("org.jetbrains.compose.ui:ui-tooling:1.12.0")
 }
