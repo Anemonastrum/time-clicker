@@ -54,9 +54,7 @@
 
         <service
             android:name=".overlay.OverlayService"
-            android:exported="false"
-            android:foregroundServiceType="specialAccess" />
-
+            android:exported="false" />
     </application>
 
 </manifest>
